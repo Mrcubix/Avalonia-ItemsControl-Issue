@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Avalonia_ItemsControl_Issue.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="450"
+             x:Class="Avalonia_ItemsControl_Issue.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+            to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <!-- last element of ItemsControl Name "Slices" need a margin of 0 -->
+        <Style Selector="#ElementsDisplay > ContentPresenter:nth-last-child(1)" >
+            <Setter Property="Margin" Value="0, 8, 0, 0" />
+        </Style>
+
+        <!-- any other have a margin of 0, 0, 0, 16 -->
+        <Style Selector="#ElementsDisplay > ContentPresenter" >
+            <Setter Property="Margin" Value="0, 8" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="*" RowDefinitions="*, Auto, Auto, Auto">
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8" Grid.Row="0">
+            <ItemsControl ItemsSource="{Binding Elements}" Name="ElementsDisplay">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextAlignment="Center"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <Button Command="{Binding AddElement}" Grid.Row="1" Margin="8" HorizontalAlignment="Stretch" >
+            <TextBlock Text="Add" TextAlignment="Center"/>
+        </Button>
+
+        <Button Command="{Binding RemoveLastElement}" Grid.Row="2" Margin="8" HorizontalAlignment="Stretch" >
+            <TextBlock Text="Remove Last" TextAlignment="Center"/>
+        </Button>
+
+        <Button Command="{Binding ResetElements}" Grid.Row="3" Margin="8" HorizontalAlignment="Stretch" >
+            <TextBlock Text="Reset" TextAlignment="Center"/>
+        </Button>
+
+    </Grid>
+</UserControl>
