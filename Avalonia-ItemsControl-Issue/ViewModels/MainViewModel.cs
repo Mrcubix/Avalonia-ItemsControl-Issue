@@ -1,38 +1,42 @@
 ﻿
 
+using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
 using ReactiveUI;
 
 namespace Avalonia_ItemsControl_Issue.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private ObservableCollection<string> _elements;
+    private ReadOnlyObservableCollection<string> _elements;
 
+    private readonly SourceCache<string, string> _elementsSourceCache = new SourceCache<string, string>(x => x);
+    
     public MainViewModel()
     {
-        Elements = new ObservableCollection<string>();
-
+        _elementsSourceCache.Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _elements)
+            .Subscribe();
+        
         BuildInterface();
     }
 
-    public ObservableCollection<string> Elements
-    {
-        get => _elements;
-        set => this.RaiseAndSetIfChanged(ref _elements, value);
-    }
+    public ReadOnlyObservableCollection<string> Elements => _elements;
 
     public void AddElement()
     {
-        Elements.Add($"Element {Elements.Count + 1}");
+        _elementsSourceCache.AddOrUpdate($"Element {Elements.Count + 1}");
     }
 
     public void RemoveLastElement()
     {
         if (Elements.Count > 0)
         {
-            Elements.RemoveAt(Elements.Count - 1);
+            _elementsSourceCache.RemoveKey(Elements[^1]);
         }
     }
 
@@ -43,18 +47,18 @@ public class MainViewModel : ViewModelBase
 
     private void BuildInterface()
     {
-        Elements.Clear();
+        _elementsSourceCache.Clear();
 
         for (int i = 0; i < 3; i++)
         {
-            Elements.Add($"Element {i + 1}");
+            _elementsSourceCache.AddOrUpdate($"Element {i + 1}");
         }
     }
 
     private async Task SomeAsyncMethod()
     {
         // simulating the time it take to close and restart a daemon app and then reconnecting
-        await Task.Delay(5000);
+        await Task.Delay(500);
 
         _ = Task.Run(BuildInterface);
     }
