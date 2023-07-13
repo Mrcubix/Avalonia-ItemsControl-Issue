@@ -2,6 +2,7 @@
 
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using ReactiveUI;
 
 namespace Avalonia_ItemsControl_Issue.ViewModels;
@@ -54,8 +55,8 @@ public class MainViewModel : ViewModelBase
     private async Task SomeAsyncMethod()
     {
         // simulating the time it take to close and restart a daemon app and then reconnecting
-        await Task.Delay(5000);
+        await Task.Delay(500);
 
-        _ = Task.Run(BuildInterface);
+        Dispatcher.UIThread.Post(BuildInterface);
     }
 }
